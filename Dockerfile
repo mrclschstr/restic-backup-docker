@@ -1,7 +1,7 @@
 FROM golang:1.11.11-alpine3.9
 MAINTAINER mrclschstr@users.noreply.github.com
 
-RUN echo http://nl.alpinelinux.org/alpine/v3.6/community >> /etc/apk/repositories
+RUN echo https://nl.alpinelinux.org/alpine/v3.9/community >> /etc/apk/repositories
 RUN apk add --no-cache git nfs-utils openssh fuse
 RUN git clone https://github.com/restic/restic \
   && cd restic \
