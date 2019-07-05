@@ -1,4 +1,4 @@
-FROM golang:1.11.11-alpine3.9
+FROM golang:1.12.6-alpine3.10
 MAINTAINER mrclschstr@users.noreply.github.com
 
 RUN echo https://nl.alpinelinux.org/alpine/v3.9/community >> /etc/apk/repositories
