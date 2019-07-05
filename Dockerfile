@@ -1,5 +1,5 @@
-FROM golang:1.9-alpine
-MAINTAINER info@lobaro.com
+FROM golang:1.11.11-alpine3.9
+MAINTAINER mrclschstr@users.noreply.github.com
 
 RUN echo http://nl.alpinelinux.org/alpine/v3.6/community >> /etc/apk/repositories
 RUN apk add --no-cache git nfs-utils openssh fuse
