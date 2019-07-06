@@ -1,8 +1,7 @@
-FROM golang:1.11.11-alpine3.9
-MAINTAINER mrclschstr@users.noreply.github.com
+FROM golang:1.12.6-alpine3.10
 
-RUN echo https://nl.alpinelinux.org/alpine/v3.9/community >> /etc/apk/repositories
-RUN apk add --no-cache git nfs-utils openssh fuse
+RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories
+RUN apk add --update --no-cache ca-certificates fuse openssh-client git nfs-utils
 RUN git clone https://github.com/restic/restic \
   && cd restic \
   && go run build.go \
@@ -11,27 +10,25 @@ RUN apk del git
 
 RUN mkdir /mnt/restic
 
-ENV RESTIC_REPOSITORY=/mnt/restic
+ENV RESTIC_REPOSITORY="/mnt/restic"
 ENV RESTIC_PASSWORD=""
 ENV RESTIC_TAG=""
 ENV NFS_TARGET=""
-# By default backup every 6 hours
-ENV BACKUP_CRON="* */6 * * *"
+ENV BACKUP_CRON="0 */6 * * *"
 ENV RESTIC_FORGET_ARGS=""
 ENV RESTIC_JOB_ARGS=""
+ENV AWS_ACCESS_KEY_ID=""
+ENV AWS_SECRET_ACCESS_KEY=""
 
 # /data is the dir where you have to put the data to be backed up
 VOLUME /data
 
 COPY backup.sh /bin/backup
 RUN chmod +x /bin/backup
-
 COPY entry.sh /entry.sh
 
 RUN touch /var/log/cron.log
 
 WORKDIR "/"
 
-#ENTRYPOINT ["ls"]
 ENTRYPOINT ["/entry.sh"]
-

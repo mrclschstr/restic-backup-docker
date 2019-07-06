@@ -18,7 +18,9 @@ logLast "BACKUP_CRON: ${BACKUP_CRON}"
 logLast "RESTIC_TAG: ${RESTIC_TAG}"
 logLast "RESTIC_FORGET_ARGS: ${RESTIC_FORGET_ARGS}"
 logLast "RESTIC_JOB_ARGS: ${RESTIC_JOB_ARGS}"
-
+logLast "RESTIC_REPOSITORY: ${RESTIC_REPOSITORY}"
+logLast "AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}"
+logLast "AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}"
 
 # Do not save full backup log to logfile but to backup-last.log
 restic backup /data ${RESTIC_JOB_ARGS} --tag=${RESTIC_TAG?"Missing environment variable RESTIC_TAG"} >> ${lastLogfile} 2>&1
@@ -30,6 +32,7 @@ else
     echo "Backup Failed with Status ${rc}"
     restic unlock
     copyErrorLog
+    kill 1
 fi
 
 if [ -n "${RESTIC_FORGET_ARGS}" ]; then
