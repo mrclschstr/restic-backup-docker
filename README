@@ -1,56 +1,39 @@
 # Restic Backup Docker Container
-A docker container to automate [restic backups](https://restic.github.io/)
-
-This container runs restic backups in regular intervals. 
+A docker container to automate [restic backups](https://restic.github.io/). This container runs restic backups in regular intervals. 
 
 * Easy setup and maintanance
 * Support for different targets (currently: Local, NFS, SFTP)
 * Support `restic mount` inside the container to browse the backup files
 
-**Container**: [lobaro/restic-backup-docker](https://hub.docker.com/r/lobaro/restic-backup-docker/)
+**Container**: [mrclschstr/restic-backup-docker](https://hub.docker.com/r/mrclschstr/restic-backup-docker)
 
-Stable
-```
-docker pull lobaro/restic-backup-docker:v1.0
-```
+Please don't hesitate to report any issue you find. **Thanks.**
 
-Latest (experimental)
-```
-docker pull lobaro/restic-backup-docker
-```
+## Credits
 
-# Test the container
+This docker container is based on the work of [lobaro/restic-backup-docker](https://github.com/lobaro/restic-backup-docker) and [Cobrijani/restic-backup-docker](https://github.com/Cobrijani/restic-backup-docker). Big shoutout and thanks for your groundwork!
 
-Clone this repository
+## Why this fork?
 
-```
-git clone https://github.com/Lobaro/restic-backup-docker.git
-cd restic-backup-docker
-```
+At the moment (July 2019) the container [lobaro/restic-backup-docker](https://github.com/lobaro/restic-backup-docker) is based on busybox and therefore backups to SFTP don't work anymore (see [#27](https://github.com/lobaro/restic-backup-docker/issues/27)). I forked the project and use the [golang (with alpine)](https://hub.docker.com/_/golang) container as a basis. The container is significantly bigger now, but backups to a SFTP target are working again.
 
-Build the container. The container is named `backup-test`
-```
-./build.sh
-```
+# Quick Setup
 
-Run the container.
-```
-./run.sh
-```
-
-This will run the container `backup-test` with the name  `backup-test`. Existing containers with that names are completly removed automatically.
-
-The container will backup `~/test-data` to a repository with password `test` at `~/test-repo` every minute. The repository is initialized automatically by the container.
-
-To enter your container execute
+To use this container just use the following docker command on your shell:
 
 ```
-docker exec -ti backup-test /bin/sh
+docker pull mrclschstr/restic-backup-docker
+```
+
+To enter your container execute:
+
+```
+docker exec -ti <your-container-name> /bin/sh
 ```
 
 Now you can use restic [as documented](https://restic.readthedocs.io/en/stable/Manual/), e.g. try to run `restic snapshots` to list all your snapshots.
 
-## Logfiles
+# Logfiles
 Logfiles are inside the container. If needed you can create volumes for them.
 
 ```
@@ -66,13 +49,15 @@ The container is setup by setting [environment variables](https://docs.docker.co
 
 ## Environment variables
 
-* `RESTIC_REPOSITORY` - the location of the restic repository. Default `/mnt/restic`
+* `RESTIC_REPOSITORY` - the location of the restic repository. Default `/mnt/restic`. For S3: `s3:https://s3.amazonaws.com/BUCKET_NAME`
 * `RESTIC_PASSWORD` - the password for the restic repository. Will also be used for restic init during first start when the repository is not initialized.
 * `RESTIC_TAG` - Optional. To tag the images created by the container.
 * `NFS_TARGET` - Optional. If set the given NFS is mounted, i.e. `mount -o nolock -v ${NFS_TARGET} /mnt/restic`. `RESTIC_REPOSITORY` must remain it's default value!
-* `BACKUP_CRON` - A cron expression to run the backup. Note: cron daemon uses UTC time zone. Default: `* */6 * * *` aka every 6 hours.
+* `BACKUP_CRON` - A cron expression to run the backup. Note: cron daemon uses UTC time zone. Default: `0 */6 * * *` aka every 6 hours.
 * `RESTIC_FORGET_ARGS` - Optional. Only if specified `restic forget` is run with the given arguments after each backup. Example value: `-e "RESTIC_FORGET_ARGS=--prune --keep-last 10 --keep-hourly 24 --keep-daily 7 --keep-weekly 52 --keep-monthly 120 --keep-yearly 100"`
 * `RESTIC_JOB_ARGS` - Optional. Allows to specify extra arguments to the back up job such as limiting bandwith with `--limit-upload` or excluding file masks with `--exclude`.
+* `AWS_ACCESS_KEY_ID` - Optional. When using restic with AWS S3 storage.
+* `AWS_SECRET_ACCESS_KEY` - Optional. When using restic with AWS S3 storage.
 
 ## Volumes
 
@@ -94,16 +79,9 @@ Now you can simply specify the restic repository to be an [SFTP repository](http
 -e "RESTIC_REPOSITORY=sftp:user@host:/tmp/backup"
 ```
 
-# Changelog
+# TODO
 
-Versioning follows [Semantic versioning](http://semver.org/)
-
-! Breaking changes
-
-**:latest**  
-* ! `--prune` must be passed to `RESTIC_FORGET_ARGS` to execute prune after forget.
-* Switch to base Docker container to `golang:1.7-alpine` to support latest restic build.
-
-
-**:v1.0**
-* First stable version
+ - Use tags for official releases and not just the master branch
+ - Provide simple docker run examples in README
+ - Include cronjob for regular restic repository checks (`restic check`)
+ - Implement mail notifications for certain events (successfull/failed backups, inconsistent repository, ...)
