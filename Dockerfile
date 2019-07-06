@@ -24,6 +24,7 @@ ENV AWS_SECRET_ACCESS_KEY=""
 VOLUME /data
 
 COPY backup.sh /bin/backup
+RUN chmod +x /bin/backup
 COPY entry.sh /entry.sh
 
 RUN touch /var/log/cron.log
