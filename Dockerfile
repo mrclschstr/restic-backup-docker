@@ -5,7 +5,9 @@ RUN apk add --update --no-cache ca-certificates fuse openssh-client git nfs-util
 RUN git clone https://github.com/restic/restic \
   && cd restic \
   && go run build.go \
-  && cp restic /usr/local/bin/
+  && cp restic /usr/local/bin/ \
+  && cd .. \
+  && rm -rf restic
 RUN apk del git
 
 RUN mkdir /mnt/restic
