@@ -1,14 +1,14 @@
-FROM golang:1.12.6-alpine3.10
+FROM alpine:3.10
 
 RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories
-RUN apk add --update --no-cache ca-certificates fuse openssh-client git nfs-utils
-RUN git clone https://github.com/restic/restic \
-  && cd restic \
-  && go run build.go \
-  && cp restic /usr/local/bin/ \
-  && cd .. \
-  && rm -rf restic
-RUN apk del git
+RUN apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils
+
+# Get restic executable
+ENV RESTIC_VERSION=0.9.5
+ADD https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_amd64.bz2 /
+RUN bzip2 -d restic_${RESTIC_VERSION}_linux_amd64.bz2 \
+  && mv restic_${RESTIC_VERSION}_linux_amd64 /usr/local/bin/restic \
+  && chmod +x /usr/local/bin/restic
 
 RUN mkdir /mnt/restic
 
