@@ -15,7 +15,7 @@ This docker container is based on the work of [lobaro/restic-backup-docker](http
 
 ## Why this fork?
 
-At the moment (July 2019) the container [lobaro/restic-backup-docker](https://github.com/lobaro/restic-backup-docker) is based on busybox and therefore backups to SFTP don't work anymore (see [#27](https://github.com/lobaro/restic-backup-docker/issues/27)). I forked the project and use the [golang (with alpine)](https://hub.docker.com/_/golang) container as a basis. The container is significantly bigger now, but backups to a SFTP target are working again.
+At the moment (July 2019) the container [lobaro/restic-backup-docker](https://github.com/lobaro/restic-backup-docker) is based on busybox and therefore backups to SFTP don't work anymore (see [#27](https://github.com/lobaro/restic-backup-docker/issues/27)). I forked the project and use the [alpine v3.10](https://hub.docker.com/_/alpine) container as a basis. The container is a little bit bigger now (~20 MB compared to 10 MB), but backups to a SFTP target are working again.
 
 # Quick Setup
 
@@ -84,4 +84,4 @@ Now you can simply specify the restic repository to be an [SFTP repository](http
  - Use tags for official releases and not just the master branch
  - Provide simple docker run examples in README
  - Include cronjob for regular restic repository checks (`restic check`)
- - Implement mail notifications for certain events (successfull/failed backups, inconsistent repository, ...)
+ - Implement mail notifications for certain events (successfull/failed backups, inconsistent repository, ...) &#8594; see [#3](https://github.com/mrclschstr/restic-backup-docker/issues/3)
