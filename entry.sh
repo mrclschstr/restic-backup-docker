@@ -26,3 +26,4 @@ echo "${BACKUP_CRON} /bin/backup >> /var/log/cron.log 2>&1" > /var/spool/cron/cr
 crond
 
 echo "Container started."
+exec "$@"
