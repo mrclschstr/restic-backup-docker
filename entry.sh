@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 echo "Starting container ..."
 
@@ -8,14 +7,13 @@ if [ -n "${NFS_TARGET}" ]; then
     mount -o nolock -v ${NFS_TARGET} /mnt/restic
 fi
 
-restic snapshots &> /dev/null
-status=$?
-if [ $status != 0 ]; then
+restic snapshots > /dev/null 2>&1
+if [ $? -gt 0 ]; then
     echo "Restic repository '${RESTIC_REPOSITORY}' does not exists. Running restic init."
-    restic init | true
 
-    init_status=$?
-    if [ $init_status != 0 ]; then
+    # INFO https://unix.stackexchange.com/questions/325705/why-is-pattern-command-true-useful/325727
+    restic init > /dev/null 2>&1
+    if [ $? -gt 0 ]; then
         echo "Failed to init the repository: '${RESTIC_REPOSITORY}'"
         exit 1
     fi
@@ -25,13 +23,6 @@ fi
 
 echo "Setup backup cron job with cron expression BACKUP_CRON: ${BACKUP_CRON}"
 echo "${BACKUP_CRON} /bin/backup >> /var/log/cron.log 2>&1" > /var/spool/cron/crontabs/root
-
-# Make sure the file exists before we start tail
-touch /var/log/cron.log
-
-# start the cron deamon
 crond
 
 echo "Container started."
-
-tail -fn0 /var/log/cron.log

@@ -7,10 +7,10 @@ RUN apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils
 ENV RESTIC_VERSION=0.9.5
 ADD https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_amd64.bz2 /
 RUN bzip2 -d restic_${RESTIC_VERSION}_linux_amd64.bz2 \
-  && mv restic_${RESTIC_VERSION}_linux_amd64 /usr/local/bin/restic \
-  && chmod +x /usr/local/bin/restic
-
-RUN mkdir /mnt/restic
+  && mv restic_${RESTIC_VERSION}_linux_amd64 /bin/restic \
+  && chmod +x /bin/restic \
+  && mkdir -p /mnt/restic /var/spool/cron/crontabs /var/log \
+  && touch /var/log/cron.log
 
 ENV RESTIC_REPOSITORY="/mnt/restic"
 ENV RESTIC_PASSWORD=""
@@ -26,11 +26,8 @@ ENV AWS_SECRET_ACCESS_KEY=""
 VOLUME /data
 
 COPY backup.sh /bin/backup
-RUN chmod +x /bin/backup
 COPY entry.sh /entry.sh
 
-RUN touch /var/log/cron.log
-
 WORKDIR "/"
-
 ENTRYPOINT ["/entry.sh"]
+CMD ["tail","-fn0","/var/log/cron.log"]
