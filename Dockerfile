@@ -1,16 +1,17 @@
 FROM alpine:3.10
 
-RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories
-RUN apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils
+# Prepare alpine image
+RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories \
+  && apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils \
+  && mkdir -p /mnt/restic /var/spool/cron/crontabs /var/log \
+  && touch /var/log/cron.log
 
 # Get restic executable
 ENV RESTIC_VERSION=0.9.5
 ADD https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_amd64.bz2 /
 RUN bzip2 -d restic_${RESTIC_VERSION}_linux_amd64.bz2 \
   && mv restic_${RESTIC_VERSION}_linux_amd64 /bin/restic \
-  && chmod +x /bin/restic \
-  && mkdir -p /mnt/restic /var/spool/cron/crontabs /var/log \
-  && touch /var/log/cron.log
+  && chmod +x /bin/restic
 
 ENV RESTIC_REPOSITORY="/mnt/restic"
 ENV RESTIC_PASSWORD=""
