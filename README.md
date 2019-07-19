@@ -1,4 +1,7 @@
 # Restic Backup Docker Container
+
+![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/mrclschstr/restic-backup-docker.svg) ![Docker Pulls](https://img.shields.io/docker/pulls/mrclschstr/restic-backup-docker.svg) ![Docker Stars](https://img.shields.io/docker/stars/mrclschstr/restic-backup-docker.svg)
+
 A docker container to automate [restic backups](https://restic.github.io/). This container runs restic backups in regular intervals. 
 
 * Easy setup and maintanance
@@ -34,12 +37,8 @@ docker exec -ti <your-container-name> /bin/sh
 Now you can use restic [as documented](https://restic.readthedocs.io/en/stable/Manual/), e.g. try to run `restic snapshots` to list all your snapshots.
 
 # Logfiles
-Logfiles are inside the container. If needed you can create volumes for them.
 
-```
-docker logs
-```
-Shows `/var/log/cron.log`
+Logfiles are inside the container. If needed you can create volumes for them. The command `docker logs` shows `/var/log/cron.log`.
 
 Additionally you can see the the full log, including restic output, of the last execution in `/var/log/backup-last.log`.
 
@@ -49,15 +48,17 @@ The container is setup by setting [environment variables](https://docs.docker.co
 
 ## Environment variables
 
-* `RESTIC_REPOSITORY` - the location of the restic repository. Default `/mnt/restic`. For S3: `s3:https://s3.amazonaws.com/BUCKET_NAME`
-* `RESTIC_PASSWORD` - the password for the restic repository. Will also be used for restic init during first start when the repository is not initialized.
-* `RESTIC_TAG` - Optional. To tag the images created by the container.
-* `NFS_TARGET` - Optional. If set the given NFS is mounted, i.e. `mount -o nolock -v ${NFS_TARGET} /mnt/restic`. `RESTIC_REPOSITORY` must remain it's default value!
-* `BACKUP_CRON` - A cron expression to run the backup. Note: cron daemon uses UTC time zone. Default: `0 */6 * * *` aka every 6 hours.
-* `RESTIC_FORGET_ARGS` - Optional. Only if specified `restic forget` is run with the given arguments after each backup. Example value: `-e "RESTIC_FORGET_ARGS=--prune --keep-last 10 --keep-hourly 24 --keep-daily 7 --keep-weekly 52 --keep-monthly 120 --keep-yearly 100"`
-* `RESTIC_JOB_ARGS` - Optional. Allows to specify extra arguments to the back up job such as limiting bandwith with `--limit-upload` or excluding file masks with `--exclude`.
-* `AWS_ACCESS_KEY_ID` - Optional. When using restic with AWS S3 storage.
-* `AWS_SECRET_ACCESS_KEY` - Optional. When using restic with AWS S3 storage.
+|  Docker Environment Variable |  Mandatory |  Default      | Description                                                                                                                                                                                                                                 |
+|------------------------------|------------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `RESTIC_REPOSITORY`          | Yes        | `/mnt/restic` | The location of the restic repository. For S3: `s3:https://s3.amazonaws.com/BUCKET_NAME`.                                                                                                                                                   |
+| `RESTIC_PASSWORD`            | Yes        | *empty*       | The password for the restic repository. Will also be used for restic init during first start when the repository is not initialized.                                                                                                        |
+| `RESTIC_TAG`                 | No         | *empty*       | To tag the images created by the container.                                                                                                                                                                                                 |
+| `NFS_TARGET`                 | No         | *empty*       | If set the given NFS is mounted, i.e. `mount -o nolock -v ${NFS_TARGET} /mnt/restic`. `RESTIC_REPOSITORY` must remain it's default value!                                                                                                   |
+| `BACKUP_CRON`                | No         | `0 */6 * * *` | A cron expression to run the backup. Note: cron daemon uses UTC time zone.                                                                                                                                                                  |
+| `RESTIC_FORGET_ARGS`         | No         | *empty*       | Only if specified `restic forget` is run with the given arguments after each backup. Example value: `-e "RESTIC_FORGET_ARGS=--prune --keep-last 10 --keep-hourly 24 --keep-daily 7 --keep-weekly 52 --keep-monthly 120 --keep-yearly 100"`. |
+| `RESTIC_JOB_ARGS`            | No         | *empty*       | Allows to specify extra arguments to the back up job such as limiting bandwith with `--limit-upload` or excluding file masks with `--exclude`.                                                                                              |
+| `AWS_ACCESS_KEY_ID`          | No         | *empty*       | When using restic with AWS S3 storage.                                                                                                                                                                                                      |
+| `AWS_SECRET_ACCESS_KEY`      | No         | *empty*       | When using restic with AWS S3 storage.                                                                                                                                                                                                      |
 
 ## Volumes
 

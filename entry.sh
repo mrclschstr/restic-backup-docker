@@ -11,7 +11,6 @@ restic snapshots > /dev/null 2>&1
 if [ $? -gt 0 ]; then
     echo "Restic repository '${RESTIC_REPOSITORY}' does not exists. Running restic init."
 
-    # INFO https://unix.stackexchange.com/questions/325705/why-is-pattern-command-true-useful/325727
     restic init > /dev/null 2>&1
     if [ $? -gt 0 ]; then
         echo "Failed to init the repository: '${RESTIC_REPOSITORY}'"
