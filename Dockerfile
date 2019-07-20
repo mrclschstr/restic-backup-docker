@@ -1,16 +1,17 @@
-FROM golang:1.12.6-alpine3.10
+FROM alpine:3.10
 
-RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories
-RUN apk add --update --no-cache ca-certificates fuse openssh-client git nfs-utils
-RUN git clone https://github.com/restic/restic \
-  && cd restic \
-  && go run build.go \
-  && cp restic /usr/local/bin/ \
-  && cd .. \
-  && rm -rf restic
-RUN apk del git
+# Prepare alpine image
+RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories \
+  && apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils heirloom-mailx \
+  && mkdir -p /mnt/restic /var/spool/cron/crontabs /var/log \
+  && touch /var/log/cron.log
 
-RUN mkdir /mnt/restic
+# Get restic executable
+ENV RESTIC_VERSION=0.9.5
+ADD https://github.com/restic/restic/releases/download/v${RESTIC_VERSION}/restic_${RESTIC_VERSION}_linux_amd64.bz2 /
+RUN bzip2 -d restic_${RESTIC_VERSION}_linux_amd64.bz2 \
+  && mv restic_${RESTIC_VERSION}_linux_amd64 /bin/restic \
+  && chmod +x /bin/restic
 
 ENV RESTIC_REPOSITORY="/mnt/restic"
 ENV RESTIC_PASSWORD=""
@@ -21,16 +22,14 @@ ENV RESTIC_FORGET_ARGS=""
 ENV RESTIC_JOB_ARGS=""
 ENV AWS_ACCESS_KEY_ID=""
 ENV AWS_SECRET_ACCESS_KEY=""
+ENV MAILX_ARGS=""
 
 # /data is the dir where you have to put the data to be backed up
 VOLUME /data
 
 COPY backup.sh /bin/backup
-RUN chmod +x /bin/backup
 COPY entry.sh /entry.sh
 
-RUN touch /var/log/cron.log
-
 WORKDIR "/"
-
 ENTRYPOINT ["/entry.sh"]
+CMD ["tail","-fn0","/var/log/cron.log"]
