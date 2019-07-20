@@ -40,7 +40,7 @@ Now you can use restic [as documented](https://restic.readthedocs.io/en/stable/M
 
 Logfiles are inside the container. If needed you can create volumes for them. The command `docker logs` shows `/var/log/cron.log`.
 
-Additionally you can see the the full log, including restic output, of the last execution in `/var/log/backup-last.log`.
+Additionally you can see the the full log, including restic output, of the last execution in `/var/log/backup-last.log`. If configured, you can find the full output of the mail notification in `/var/log/mail-last.log`.
 
 # Customize the Container
 
