@@ -2,7 +2,7 @@ FROM alpine:3.10
 
 # Prepare alpine image
 RUN echo https://nl.alpinelinux.org/alpine/v3.10/community >> /etc/apk/repositories \
-  && apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils \
+  && apk add --update --no-cache ca-certificates fuse openssh-client nfs-utils heirloom-mailx \
   && mkdir -p /mnt/restic /var/spool/cron/crontabs /var/log \
   && touch /var/log/cron.log
 
@@ -22,6 +22,7 @@ ENV RESTIC_FORGET_ARGS=""
 ENV RESTIC_JOB_ARGS=""
 ENV AWS_ACCESS_KEY_ID=""
 ENV AWS_SECRET_ACCESS_KEY=""
+ENV MAILX_ARGS=""
 
 # /data is the dir where you have to put the data to be backed up
 VOLUME /data

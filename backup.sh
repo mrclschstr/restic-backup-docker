@@ -43,9 +43,11 @@ fi
 end=`date +%s`
 outputAndLog "Finished at $(date +"%Y-%m-%d %H:%M:%S") after $((end-start)) seconds"
 
-# if [ -n ${MAIL_RECEIPIENT} ] && [ grep -sq "/etc/ssmtp/ssmtp.conf" /proc/mounts ]; then
-#   # INFO https://wiki.archlinux.org/index.php/SSMTP
-#   # INFO https://decatec.de/home-server/linux-einfach-e-mails-senden-mit-ssmtp/
-#   # INFO https://gist.github.com/titpetric/114eb27f6e453e3e8849d65ca1a3d360
-#   mailx -s "Subject" -r "From" ${MAIL_RECEIPIENT} < ${lastLogfile}
-# fi
+if [ -n ${MAILX_ARGS} ]; then
+    mailx ${MAILX_ARGS} < ${lastLogfile} > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        outputAndLog "Mail notification successfully sent."
+    else
+        outputAndLog "Sending mail notification FAILED. Please check your SMTP configuration!"
+    fi
+fi
