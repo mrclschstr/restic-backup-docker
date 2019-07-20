@@ -43,7 +43,7 @@ fi
 end=`date +%s`
 outputAndLog "Finished at $(date +"%Y-%m-%d %H:%M:%S") after $((end-start)) seconds"
 
-if [ -n ${MAILX_ARGS} ]; then
+if [ -n "${MAILX_ARGS}" ]; then
     mailx -S sendwait ${MAILX_ARGS} < ${lastLogfile} > /dev/null 2>&1
     if [ $? -eq 0 ]; then
         outputAndLog "Mail notification successfully sent."
